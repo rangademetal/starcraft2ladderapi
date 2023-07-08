@@ -9,7 +9,7 @@ from database.connector import ConnectorSQLAlchemy
 from database.database_model import Base, Starcraft2Ladder_model
 
 if __name__ == '__main__':
-    with open('db_credential.json', "r") as database_credential:
+    with open(r'F:\data\db_credential.json', "r") as database_credential:
         credential = json.load(database_credential)
 
         connector_database = ConnectorSQLAlchemy(
