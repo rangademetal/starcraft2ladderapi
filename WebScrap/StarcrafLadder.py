@@ -11,40 +11,43 @@ class Starcraft2Ladder:
 
     async def get_rank(self):
         async with aiohttp.ClientSession() as session:
-            async with session.get('https://www.rankedftw.com/ladder/lotv/1v1/mmr/') as response:
+            async with session.get('https://ds-rating.com/players') as response:
                 soup = BeautifulSoup(await response.text(), 'html.parser')
-                table = soup.find_all('a', {'class': "row"})
-                arr = []
-                for i in table:
-                    details = i.find_all('div', {'class': 'cell number'})
+                # print(soup)
+                details = soup.find('tbody', {"id":"players_table"})
+                # print(details)
+                rows = details.find_all("tr")
+                details = []
+                for row in rows:
 
-                    rank = details[0].text
-                    mmr = details[1].text
-                    points = details[2].text
-                    wins = details[3].text
-                    losses = details[4].text
-                    played = details[5].text
-                    winrate = details[6].text
-                    player_name = i.find('div', 'cell player').text.strip()
+                    rank = row.find('th').text.split('.')[0]
+                    name = row.findNext('th').text.split('.')[1].strip()
+                    ratting = row.find_next('td').text
+                    game_played = row.findNext('td').findNext('td').text
+                    winrate = row.findNext('td').findNext('td').findNext('td').text
+                    region = row.findNext('td').findNext('td').findNext('td').findNext('td').text
+                    commander = row.findNext('td').findNext('td').findNext('td').findNext('td').findNext('td').text
 
-                    arr.append({
-                        "rank": rank,
-                        "name": player_name,
-                        "mmr": mmr,
-                        "points": points,
-                        "win": wins,
-                        "lost": losses,
-                        "game_played": played,
-                        "win_rate": winrate
+                    details.append({
+                        'rank': rank,
+                        'name': name,
+                        'ratting': ratting,
+                        "game_played": game_played,
+                        "winrate": winrate,
+                        'region': region,
+                        "commander": commander
                     })
-                return arr
+                return details
+
+# sc = Starcraft2Ladder()
+# print(asyncio.run(sc.get_rank()))
 
 
-a = Starcraft2Ladder()
-data = asyncio.run(a.get_rank())
-# data = json.load(data)
-
-with open('test.json', "w") as file_writer:
-    json.dump(data, file_writer, indent=4 )
 
 
+
+                # return arr
+
+#
+# sc = Starcraft2Ladder()
+# print(asyncio.run(sc.get_rank()))
